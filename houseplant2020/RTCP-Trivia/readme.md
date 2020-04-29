@@ -38,9 +38,9 @@ After this request server sends one question everytime.
 {"method":"question","id":"0acfdfca-3543-48a6-a290-b95a449b8e66","questionText":"m2K5LEjFUCgXFPROL4WlzZbgqoHGCuHgoBo8tG92WqP0K6XrgQIdS4dQ/yB+yleMKoFgVDR6gLcT8qcZE9Kz4cq0tuEqtCtFtrKWVRYZeE0=","options":["X2z/7l6+mygiwrE6AOdkJw==","OnOVHe/7UtoSFlfJkT1H7Q==","Z3+Fgtrct2O7u1hqsAKcKw==","576l1csP0AX5Y6EcaKo2Qg=="],"correctAnswer":"EShNMH7MU91HQtIrbJCkhxHZKZEmwpmKqALVuoAdx24=","requestIdentifier":"bc1e6c71224e40d76c19b1d76d3db662"}
 ```
 
-![image-20200427005135677](https://github.com/BirdsArentRealCTF/RTCP-Trivia/raw/master/image-20200427005135677.png)
+![image-20200427005135677](https://github.com/BirdsArentRealCTF/Writeups/raw/master/houseplant2020/RTCP-Trivia/image-20200427005135677.png)
 
-Every field that matters is aes-cbc encrypted with pkcs7 padding. So my idea was using frida get the KEY and IV for script you can look at my github repo (https://github.com/BirdsArentRealCTF/RTCP-Trivia).
+Every field that matters is aes-cbc encrypted with pkcs7 padding. So my idea was using frida get the KEY and IV for script you can look at my github repo (https://github.com/BirdsArentRealCTF/Writeups/tree/master/houseplant2020/RTCP-Trivia).
 
 ```
 KEY 61798024a3e9bb3b4be28cca863af54b2af0b4b27248599c8b7a3b1c179296bc
