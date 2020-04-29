@@ -16,7 +16,7 @@ As for the source file itself, it just has a bunch of jumbled variable names, bu
 
 ## What it does to your input
 
-Basically, in the `tough` class, there are two static integer arrays that are scrambled versions of numbers 1 to 24.  Your input and a key like variable will then be scrambled with both variations based on those two arrays.
+Basically, in the `tough` class, there are two static integer arrays that are scrambled versions of numbers 0 to 23.  Your input and a key like variable will then be scrambled with both variations based on those two arrays.
 ```java
 public static int[] realflag = {9,4,23,8,17,1,18,0,13,7,2,20,16,10,22,12,19,6,15,21,3,14,5,11};
 public static int[] therealflag = {20,16,12,9,6,15,21,3,18,0,13,7,1,4,23,8,17,2,10,22,19,11,14,5};
