@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trivia baby</title>
+</head>
+
+<body>
+    <div id="flag"></div>
+    <div id="logs"></div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aes-js/3.1.2/index.min.js" integrity="sha256-ahHqM0CBwtcKufWj6VHBM+SzH9DQ6a3WGBFfB/oKNt8=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-sha256/0.9.0/sha256.min.js" integrity="sha256-cVdRFpfbdE04SloqhkavI/PJBWCr+TuyQP3WkLKaiYo=" crossorigin="anonymous"></script>
+    <script>
+        const socket = new WebSocket("ws://challs.houseplant.riceteacatpanda.wtf:40001");
+        let step = 0;
+        const userToken = "ef05da6fe7335948f5cf46365f997f4517ac8dceb76bb471e66969e5887dc924";
+        const generateKey = function(id) {
+            const c = sha256(`cbce23dfcdc7efe826d23bbf3d635d8fd55b6499d16ca8830a973ff57175119f:${userToken}`);
+            return sha256(`${c}:${id}`);
+        };
+
+        const base64ToHex = (str) => {
+            const raw = atob(str);
+            let result = "";
+            for (let i = 0; i < raw.length; i++) {
+                const hex = raw.charCodeAt(i).toString(16);
+                result += hex.length === 2 ? hex : "0" + hex;
+            }
+            return result.toUpperCase();
+        };
+
+        const decryptAES = (enc, key, iv) => {
+            const aesCbc = new aesjs.ModeOfOperation.cbc(aesjs.utils.hex.toBytes(key), aesjs.utils.hex.toBytes(iv));
+            const encryptedBytes = aesjs.utils.hex.toBytes(base64ToHex(enc));
+            const decryptedBytes = aesCbc.decrypt(encryptedBytes);
+            return unescape(aesjs.utils.utf8.fromBytes(aesjs.padding.pkcs7.strip(decryptedBytes)));
+        };
+
+        const decryptQuestion = (req) => {
+            const key = generateKey(req.id);
+            return decryptAES(req.questionText, key, req.requestIdentifier);
+        };
+
+        const findAnswer = (req) => {
+            const key = generateKey(req.id);
+            const correctAnswer = decryptAES(req.correctAnswer, key, req.requestIdentifier)[0];
+            return [correctAnswer, decryptAES(req.options[correctAnswer], key, req.requestIdentifier)];
+        };
+
+        socket.onmessage = (msg) => {
+            if (step === 0) {
+                socket.send('{"method":"start"}');
+                step++;
+            } else {
+                const req = JSON.parse(msg.data);
+                if (req.method === "question") {
+                    const answer = findAnswer(req);
+                    document.getElementById("logs").prepend(document.createElement("br"));
+                    document.getElementById("logs").prepend(document.createElement("div").innerText = `Question ${step} ${decryptQuestion(req) + " " + answer[1]}`);
+                    socket.send(`{"method": "answer","answer": ${answer[0]}}`);
+                    step++;
+                } else if (req.method === "flag") {
+                    document.getElementById("flag").innerText = `FLAG: ${req.flag}`;
+                }
+            }
+        };
+
+        setTimeout(() => {
+            socket.send(`{"method":"ident","userToken":"${userToken}"}`);
+        }, 1e3);
+    </script>
+</body>
+
+</html>
