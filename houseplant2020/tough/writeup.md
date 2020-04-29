@@ -77,7 +77,7 @@ If the result of these transformations does not equal the intended string mentio
 
 It's just like all the other Java reversing challenges in this CTF.  Simply reverse the operations from the last loop to the first loop.
 Perhaps one thing to note is that for the final loop, it can be reversed by making an assumpting that if any char - 10 falls within the conditional range, we use char - 10; otherwise, we use the original one.
-The only other thing to note is that you have to descramble the string you recieve from reversing those loops to recieve the correct input.  Below is my solve script with comments (it can also be found in this same folder):
+The only other thing to note is that you have to descramble the string you recieve from reversing those loops to recieve the correct input.  Below is my solve script with comments (it can also be found in this same folder).  Do note that this won't give the exact flag as you will see later:
 ```java
 import java.util.*;
 
