@@ -2,11 +2,11 @@ If you look at the source code of the challenge you can see they used browserify
 
 But in this writeup we are gonna use chrome developer console, put breakpoint in a good place and take control of the socket. Test manually and leak totp keys.
 
-![image-20200427112039042](https://github.com/BirdsArentRealCTF/Writeups/raw/master/houseplant2020/Blog-from-the-future/image-20200427112039042.png)
+![image-20200427112039042](https://github.com/BirdsArentRealCTF/Writeups/raw/master/houseplant2020/blog-from-the-future/image-20200427112039042.png)
 
 I choose 2146th line because we can see response from server in here. And we can access to websocket and msgpack class. 
 
-![image-20200427112558712](https://github.com/BirdsArentRealCTF/Writeups/raw/master/houseplant2020/Blog-from-the-future/image-20200427112558712.png)
+![image-20200427112558712](https://github.com/BirdsArentRealCTF/Writeups/raw/master/houseplant2020/blog-from-the-future/image-20200427112558712.png)
 
 After we get those we can manually test our payloads.
 
@@ -14,7 +14,7 @@ After we get those we can manually test our payloads.
 r.send(o.encode(["getPost", "1"]))
 ```
 
-![image-20200427112824345](https://github.com/BirdsArentRealCTF/Writeups/raw/master/houseplant2020/Blog-from-the-future/image-20200427112824345.png)
+![image-20200427112824345](https://github.com/BirdsArentRealCTF/Writeups/raw/master/houseplant2020/blog-from-the-future/image-20200427112824345.png)
 
 ```json
 author: 1
@@ -78,6 +78,6 @@ totp.now() # => '677619'
 
 Login and get the flag!
 
-Don't forget to check my automated blind boolean script https://github.com/BirdsArentRealCTF/Writeups/blob/master/houseplant2020/Blog-from-the-future/index.html
+Don't forget to check my automated blind boolean script https://github.com/BirdsArentRealCTF/Writeups/blob/master/houseplant2020/blog-from-the-future/index.html
 
 Do you have any questions or suggestion? Feel free to contact via discord. **enjloezz#7444**
