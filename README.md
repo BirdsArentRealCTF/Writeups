@@ -14,6 +14,7 @@
 | [redpwnCTF 2020](https://ctftime.org/event/995) | [albatross](https://ctftime.org/task/12098) | [bjornmorten](https://ctftime.org/user/78385)  | Jail, Code-Golfing | [Link](https://birdsarentrealctf.dev/2020/06/25/RedpwnCTF-2020-Albatross-Writeup-bjornmorten.html) |
 | [redpwnCTF 2020](https://ctftime.org/event/995) | [wintendo-nii](https://ctftime.org/task/12145) | [hevr](https://ctftime.org/user/71786)  | Reverse, Firmware | [Link](https://www.reversing.tech/2020/07/25/nii-redpwn-2020-OEP.html) |
 | [redpwnCTF 2020](https://ctftime.org/event/995) | [chezzzboard](https://ctftime.org/task/12136) | [hevr](https://ctftime.org/user/71786)  | Reverse, Z3 | [Link](https://www.reversing.tech/2020/07/25/nii-redpwn-2020-OEP.html) |
-| [CUCTF 2020](https://ctftime.org/event/1011) | HotRod | [willsroot](https://ctftime.org/user/65237)  | Kernel, Heap, Race, Timerfd_Ctx | [Link](https://www.willsroot.io/2020/10/cuctf-2020-hotrod-kernel-writeup.html) |
-| [CUCTF 2020](https://ctftime.org/event/1011) | Dr. Xorisaurus | [willsroot](https://ctftime.org/user/65237)  | Glibc, 2.32, UAF | [Link](https://www.willsroot.io/2020/10/cuctf-2020-dr-xorisaurus-heap-writeup.html) |
+| [CUCTF 2020](https://ctftime.org/event/1011) | [HotRod](https://ctftime.org/task/13387) | [willsroot](https://ctftime.org/user/65237)  | Kernel, Heap, Race, Timerfd_Ctx | [Link](https://www.willsroot.io/2020/10/cuctf-2020-hotrod-kernel-writeup.html) |
+| [CUCTF 2020](https://ctftime.org/event/1011) | [HotRod](https://ctftime.org/task/13387) | [D3v17](https://ctftime.org/user/78391)  | Kernel, Heap, Race, Timerfd_Ctx | [Link](https://syst3mfailure.github.io/hotrod) |
+| [CUCTF 2020](https://ctftime.org/event/1011) | [Dr. Xorisaurus](https://ctftime.org/task/13390) | [willsroot](https://ctftime.org/user/65237)  | Glibc, 2.32, UAF | [Link](https://www.willsroot.io/2020/10/cuctf-2020-dr-xorisaurus-heap-writeup.html) |
 
